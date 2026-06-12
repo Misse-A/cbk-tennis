@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="description" content="Matches, results and ranking of CBK inter-departmental games 2026 tennis.">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:description" content="Matches, results and ranking of CBK inter-departmental games 2026 tennis.">
+<meta property="og:image" content="https://img.magnific.com/free-vector/3d-tennis-ball-isolated_1308-121223.jpg">
+
+<!-- Twitter -->
+<meta name="twitter:description" content="Matches, results and ranking of CBK inter-departmental games 2026 tennis.">
+<meta name="twitter:image" content="https://img.magnific.com/free-vector/3d-tennis-ball-isolated_1308-121223.jpg">
+
+<link rel="icon" type="image/jpeg" href="https://img.magnific.com/free-vector/3d-tennis-ball-isolated_1308-121223.jpg">
+
+<title>Tennis | CBK Tennis Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+
+        body { 
+            font-family: 'Roboto Condensed', sans-serif; 
+            background: #f4f7f6; 
+            padding: 0; 
+            margin: 0; 
+            color: #112f6c; 
+        }
+        .container { max-width: 800px; margin: auto; padding: 0 20px; }
+        
+        h1 { 
+            text-align: center; 
+            background-color: #112f6c; 
+            color: white; 
+            padding: 20px 0; 
+            margin: 0 0 20px 0;
+            width: 100%;
+            font-size: 1.8em;
+        }
+        
+        .menu { display: flex; gap: 10px; margin: 20px 0; justify-content: center; flex-wrap: wrap; }
+        button { 
+            padding: 10px 15px; cursor: pointer; border: none; 
+            background: #112f6c; color: white; border-radius: 4px; transition: 0.3s; 
+        }
+        button.active-tab { background: #fbbc04 !important; color: #333 !important; font-weight: bold; }
+        
+        .view { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .active { display: block; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background-color: #fbbc04; color: #112f6c; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; }
+        
+        .match { padding: 15px; border-bottom: 1px solid #eee; }
+        .match:nth-child(even) { background-color: #f9f9f9; }
+        
+        .p-name { font-weight: bold; }
+        .t-name { font-size: 0.85em; font-style: italic; color: #7f8c8d; }
+        #search { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <h1>CBK GAMES 2026 | TENNIS</h1>
+
+    <div class="container">
+        <input type="text" id="search" placeholder="Search matches, players, or teams..." onkeyup="filter()">
+        <div class="menu">
+            <button class="active-tab" onclick="show('upcoming', this)">Upcoming</button>
+            <button onclick="show('played', this)">Played</button>
+            <button onclick="show('teams', this)">Team Ranking</button>
+            <button onclick="show('players', this)">Player Ranking</button>
+        </div>
+
+        <div id="upcoming" class="view active"><h3>Upcoming Matches</h3><div id="m-list"></div></div>
+        <div id="played" class="view"><h3>Played Matches</h3><div id="played-list"></div></div>
+        <div id="teams" class="view"><h3>Team Rankings</h3><div id="t-list"></div></div>
+        <div id="players" class="view"><h3>Player Rankings</h3><div id="p-list"></div></div>
+    </div>
+
+<script>
+    const API = 'https://script.google.com/macros/s/AKfycbzHpjybtahtknihQNZLKIfTSjpjS4_AWI0M7AcfWgjOna7EafeNDd-JLsELuiHnobkt/exec';
+    
+    fetch(API).then(r => r.json()).then(data => {
+        document.getElementById('m-list').innerHTML = data.upcoming.map(m => 
+            `<div class="match"><span class="p-name">${m[3]}</span> <span class="t-name">${m[2]}</span> vs <span class="p-name">${m[7]}</span> <span class="t-name">${m[6]}</span><br><small>${m[0]} | ${m[1]}</small></div>`).join('');
+        
+        document.getElementById('played-list').innerHTML = data.played.map(m => 
+            `<div class="match"><span class="p-name">${m[3]}</span> <span class="t-name">${m[2]}</span> <strong>${m[4]}</strong> vs <span class="p-name">${m[7]}</span> <span class="t-name">${m[6]}</span> <strong>${m[8]}</strong></div>`).join('');
+
+        document.getElementById('t-list').innerHTML = [["Men's Teams", data.menTeams], ["Ladies' Teams", data.ladiesTeams], ["Combined", data.combinedTeams]].map(t => 
+            `<h4>${t[0]}</h4><table><tr><th>Rank</th><th>Team</th><th>Points</th></tr>${t[1].sort((a,b)=>b[2]-a[2]).map((r,i) => `<tr><td>${i==0?'🥇':i+1}</td><td>${r[0]}</td><td>${r[2]}</td></tr>`).join('')}</table>`).join('');
+
+        document.getElementById('p-list').innerHTML = [["Men's Players", data.menPlayers], ["Ladies' Players", data.ladiesPlayers]].map(t => 
+            `<h4>${t[0]}</h4><table><tr><th>Rank</th><th>Player</th><th>Team</th><th>Points</th></tr>${t[1].sort((a,b)=>b[3]-a[3]).map((r,i) => `<tr><td>${i<3?['🥇','🥈','🥉'][i]:i+1}</td><td>${r[1]}</td><td><span class="t-name">${r[0]}</span></td><td>${r[3]}</td></tr>`).join('')}</table>`).join('');
+    });
+
+    function show(id, btn) {
+        // Hide all views
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        // Show selected
+        document.getElementById(id).classList.add('active');
+        
+        // Handle Button Classes
+        document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active-tab'));
+        btn.classList.add('active-tab');
+    }
+    
+    function filter() {
+        const term = document.getElementById('search').value.toLowerCase();
+        document.querySelectorAll('tr, .match').forEach(el => el.style.display = el.innerText.toLowerCase().includes(term) ? '' : 'none');
+    }
+</script>
+</body>
+</html>
