@@ -15,47 +15,44 @@
 <link rel="icon" type="image/jpeg" href="https://img.magnific.com/free-vector/3d-tennis-ball-isolated_1308-121223.jpg">
 
 <title>Tennis | CBK Tennis Dashboard</title>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap');
 
-        body { 
-            font-family: 'Roboto Condensed', sans-serif; 
-            background: #f4f7f6; 
-            padding: 0; margin: 0; color: #112f6c; 
-        }
-        .container { width: 100%; max-width: 800px; margin: auto; padding: 0 5px; box-sizing: border-box; }
+        :root { --primary: #112f6c; --accent: #fbbc04; --bg: #f4f7f6; }
+        body { font-family: 'Roboto Condensed', sans-serif; background: var(--bg); margin: 0; color: #112f6c; }
+        .container { width: 95%; max-width: 800px; margin: auto; padding: 10px 0; }
         
-        h1 { 
-            text-align: center; 
-            background-color: #112f6c; 
-            color: white; 
-            padding: 15px 10px; 
-            margin: 0 0 15px 0; 
-            font-size: 1.4em;
-        }
+        h1 { text-align: center; background-color: var(--primary); color: white; padding: 15px; margin: 0; }
         
-        .menu { display: flex; gap: 5px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
-        button { 
-            padding: 8px 10px; cursor: pointer; border: none; 
-            background: #112f6c; color: white; border-radius: 4px; font-size: 0.9em;
-        }
-        button.active-tab { background: #fbbc04 !important; color: #333 !important; font-weight: bold; }
-        
-        .view { display: none; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        /* Navigation */
+        .menu-container { position: relative; margin-bottom: 10px; }
+        .hamburger { display: none; width: 100%; padding: 12px; background: var(--primary); color: white; border: none; font-size: 1.1em; cursor: pointer; }
+        .menu { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+        button { padding: 10px 15px; cursor: pointer; border: none; background: var(--primary); color: white; border-radius: 4px; }
+        button.active-tab { background: var(--accent); color: #333; font-weight: bold; }
+
+        #search { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .view { display: none; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .active { display: block; }
         
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        /* Matches Styling */
+        .match { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        .row { display: flex; flex-direction: column; align-items: left; gap: 2px; margin-bottom: 5px; }
+        .winner { font-weight: bold; color: #000; }
+        .vs { font-weight: bold; color: var(--accent); margin: 5px 0; }
+        .meta { font-size: 0.85em; color: #7f8c8d; font-style: italic; margin-top: 8px; }
+        
+        /* Table Styling */
+        .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
-        th { background-color: #fbbc04; color: #112f6c; padding: 8px; text-align: left; }
-        td { padding: 8px; border-bottom: 1px solid #ddd; }
-        
-        .match { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.95em; }
-        .match:nth-child(even) { background-color: #f9f9f9; }
-        
-        .p-name { font-weight: bold; }
-        .t-name { font-size: 0.8em; font-style: italic; color: #7f8c8d; }
-        #search { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        th { background-color: var(--accent); color: var(--primary); padding: 8px 4px; }
+        td { padding: 8px 4px; border-bottom: 1px solid #ddd; text-align: center; }
+
+        @media (max-width: 600px) {
+            .menu { display: none; flex-direction: column; }
+            .menu.show { display: flex; }
+            .hamburger { display: block; }
+        }
     </style>
 </head>
 <body>
@@ -63,44 +60,65 @@
     <h1>CBK GAMES 2026 | TENNIS</h1>
 
     <div class="container">
-        <input type="text" id="search" placeholder="Search..." onkeyup="filter()">
-        <div class="menu">
-            <button class="active-tab" onclick="show('upcoming', this)">Upcoming</button>
-            <button onclick="show('played', this)">Played</button>
-            <button onclick="show('teams', this)">Team Ranking</button>
-            <button onclick="show('players', this)">Player Ranking</button>
+        <div class="menu-container">
+            <button class="hamburger" onclick="toggleMenu()">☰ Menu</button>
+            <div class="menu" id="navMenu">
+                <button class="active-tab" onclick="show('upcoming', this)">Upcoming</button>
+                <button onclick="show('played', this)">Played</button>
+                <button onclick="show('teams', this)">Team Ranking</button>
+                <button onclick="show('players', this)">Player Ranking</button>
+            </div>
         </div>
+
+        <input type="text" id="search" placeholder="Search..." onkeyup="filter()">
 
         <div id="upcoming" class="view active"><h3>Upcoming Matches</h3><div id="m-list"></div></div>
         <div id="played" class="view"><h3>Played Matches</h3><div id="played-list"></div></div>
-        <div id="teams" class="view"><h3>Team Rankings</h3><div id="t-list" class="table-responsive"></div></div>
-        <div id="players" class="view"><h3>Player Rankings</h3><div id="p-list" class="table-responsive"></div></div>
+        <div id="teams" class="view"><h3>Team Rankings</h3><div id="t-list"></div></div>
+        <div id="players" class="view"><h3>Player Rankings</h3><div id="p-list"></div></div>
     </div>
 
 <script>
     const API = 'https://script.google.com/macros/s/AKfycbzHpjybtahtknihQNZLKIfTSjpjS4_AWI0M7AcfWgjOna7EafeNDd-JLsELuiHnobkt/exec';
     
     fetch(API).then(r => r.json()).then(data => {
+        // Upcoming
         document.getElementById('m-list').innerHTML = data.upcoming.map(m => 
-            `<div class="match"><span class="p-name">${m[3]}</span> <span class="t-name">${m[2]}</span> vs <span class="p-name">${m[7]}</span> <span class="t-name">${m[6]}</span><br><small>${m[0]} | ${m[1]}</small></div>`).join('');
+            `<div class="match">
+                <div class="row"><span>${m[3]} ${m[2]}</span></div>
+                <div class="vs">vs</div>
+                <div class="row"><span>${m[7]} ${m[6]}</span></div>
+                <div class="meta">${m[0]} | ${m[1]}</div>
+            </div>`).join('');
         
-        document.getElementById('played-list').innerHTML = data.played.map(m => 
-            `<div class="match"><span class="p-name">${m[3]}</span> <span class="t-name">${m[2]}</span> <strong>${m[4]}</strong> vs <span class="p-name">${m[7]}</span> <span class="t-name">${m[6]}</span> <strong>${m[8]}</strong></div>`).join('');
+        // Played
+        document.getElementById('played-list').innerHTML = data.played.map(m => {
+            const s1 = parseInt(m[4]);
+            const s2 = parseInt(m[8]);
+            const p1Class = s1 > s2 ? 'winner' : '';
+            const p2Class = s2 > s1 ? 'winner' : '';
+            return `<div class="match">
+                <div class="row ${p1Class}"><span>${m[3]} ${m[2]} ${m[4]}</span></div>
+                <div class="row ${p2Class}"><span>${m[7]} ${m[6]} ${m[8]}</span></div>
+            </div>`;
+        }).join('');
 
+        // Tables (Simplified for mobile)
         document.getElementById('t-list').innerHTML = [["Men's Teams", data.menTeams], ["Ladies' Teams", data.ladiesTeams], ["Combined", data.combinedTeams]].map(t => 
-            `<h4>${t[0]}</h4><table><tr><th>Rank</th><th>Team</th><th>Points</th></tr>${t[1].sort((a,b)=>b[2]-a[2]).map((r,i) => `<tr><td>${i==0?'🥇':i+1}</td><td>${r[0]}</td><td>${r[2]}</td></tr>`).join('')}</table>`).join('');
+            `<h4>${t[0]}</h4><div class="table-responsive"><table><tr><th>Rank</th><th>Team</th><th>Pts</th></tr>${t[1].sort((a,b)=>b[2]-a[2]).map((r,i) => `<tr><td>${i==0?'🥇':i+1}</td><td>${r[0]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>`).join('');
 
         document.getElementById('p-list').innerHTML = [["Men's Players", data.menPlayers], ["Ladies' Players", data.ladiesPlayers]].map(t => 
-            `<h4>${t[0]}</h4><table><tr><th>Rank</th><th>Player</th><th>Team</th><th>Points</th></tr>${t[1].sort((a,b)=>b[3]-a[3]).map((r,i) => `<tr><td>${i<3?['🥇','🥈','🥉'][i]:i+1}</td><td>${r[1]}</td><td><span class="t-name">${r[0]}</span></td><td>${r[3]}</td></tr>`).join('')}</table>`).join('');
+            `<h4>${t[0]}</h4><div class="table-responsive"><table><tr><th>Rank</th><th>Player</th><th>Pts</th></tr>${t[1].sort((a,b)=>b[3]-a[3]).map((r,i) => `<tr><td>${i<3?['🥇','🥈','🥉'][i]:i+1}</td><td>${r[1]}</td><td>${r[3]}</td></tr>`).join('')}</table></div>`).join('');
     });
 
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('show'); }
     function show(id, btn) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active-tab'));
         btn.classList.add('active-tab');
+        if(window.innerWidth <= 600) document.getElementById('navMenu').classList.remove('show');
     }
-    
     function filter() {
         const term = document.getElementById('search').value.toLowerCase();
         document.querySelectorAll('tr, .match').forEach(el => el.style.display = el.innerText.toLowerCase().includes(term) ? '' : 'none');
