@@ -83,7 +83,7 @@
     
     fetch(API).then(r => r.json()).then(data => {
         // Upcoming
-        document.getElementById('m-list').innerHTML = data.upcoming.map(m => 
+        document.getElementById('m-list').innerHTML = data.Played.map(m => 
             `<div class="match">
                 <div class="row"><span>${m[3]} ${m[2]}</span></div>
                 <div class="vs">vs</div>
